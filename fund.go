@@ -20,3 +20,6 @@ func (f *Fund) Balance() int {
 func (f *Fund) Withdraw(amount int) {
 	f.balance -= amount
 }
+func (f *Fund) Deposit(amount int) {
+	f.balance += amount
+}

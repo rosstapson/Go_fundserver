@@ -13,7 +13,7 @@ func NewFundServer(initialBalance int) *FundServer {
 	server := &FundServer{
 		// make() creates builtins like channels, maps and slices
 		Commands: make(chan interface{}),
-		fund: NewFund(initialBalance),
+		fund: *NewFund(initialBalance),
 	}
 
 	//Spawn off the server's main loop immediately
@@ -22,8 +22,7 @@ func NewFundServer(initialBalance int) *FundServer {
 }
 
 func (s *FundServer) loop() {
-	// The built-in "range" clause can iterate over channels, 
-	// amongst other things
+	
 	for command := range s.Commands {
 		// command is just an interface{} but we can check its real type
 		switch command.(type) {
@@ -37,6 +36,10 @@ func (s *FundServer) loop() {
 				balance := s.fund.Balance()
 				getBalance.Response <- balance
 
+			case DepositCommand:
+				deposit := command.(DepositCommand)
+				s.fund.Deposit(deposit.Amount)
+
 			default:
 				panic(fmt.Sprintf("Unrecognized command: %v", command))
 		}
@@ -49,4 +52,7 @@ type WithdrawCommand struct {
 
 type BalanceCommand struct {
 	Response chan int
+}
+type DepositCommand struct {
+	Amount int
 }
